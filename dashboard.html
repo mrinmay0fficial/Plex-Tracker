@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M30 85 V15 H65 C80 15 80 50 65 50 H30' fill='none' stroke='%2300FFFF' stroke-width='12' stroke-linecap='round' stroke-linejoin='round'/><circle cx='60' cy='32.5' r='8' fill='%2339FF14'/></svg>">
+<title>PlexTracker | Dashboard</title>
+<h2 class="sr-only" style="display:none;">Personalized fitness and daily to-do dashboard</h2>
+
+<style>
+  :root {
+    --color-bg-main: #000000;
+    --color-bg-card: #111111;
+    --color-border: #222222;
+    --color-text-main: #ffffff;
+    --color-text-dim: #888888;
+    
+    /* Vibrant Neon Palette */
+    --neon-cyan: #00FFFF;
+    --neon-pink: #FF007F;
+    --neon-yellow: #FFEA00;
+    --neon-green: #39FF14;
+    --neon-purple: #BF00FF;
+
+    --border-radius-md: 8px;
+    --border-radius-lg: 16px;
+  }
+  
+  body {
+    background-color: var(--color-bg-main);
+    color: var(--color-text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  .container { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
+  
+  /* PlexTracker Logo */
+  .logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .logo-text { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: var(--color-text-main); }
+  .logo-text span { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);}
+
+  .dtab{cursor:pointer;padding:6px 12px;border-radius:var(--border-radius-md);border:1px solid var(--color-border);background:transparent;color:var(--color-text-dim);font-size:12px;font-family:inherit;margin-bottom:5px; transition: 0.2s;}
+  .dtab.on{background:var(--color-bg-card);color:var(--neon-cyan);border-color:var(--neon-cyan);font-weight:700;}
+  
+  .cb{width:18px;height:18px;border-radius:4px;border:2px solid var(--color-border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition: 0.2s;}
+  .cb.v{background:var(--neon-pink);border-color:var(--neon-pink);box-shadow: 0 0 8px rgba(255, 0, 127, 0.4);}
+  
+  .rcb{width:18px;height:18px;border-radius:50%;border:2px solid var(--color-border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition: 0.2s;}
+  .rcb.v{background:var(--neon-green);border-color:var(--neon-green);box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);}
+  
+  .hc{width:22px;height:22px;border-radius:6px;border:1px solid var(--color-border);cursor:pointer; transition: 0.2s;}
+  .hc.v{background:var(--neon-purple);border-color:var(--neon-purple); box-shadow: 0 0 8px rgba(191, 0, 255, 0.5);}
+  
+  .wcup{width:32px;height:42px;border:2px solid var(--neon-cyan);border-top:none;border-radius:0 0 10px 10px;cursor:pointer;transition:background 0.2s;}
+  .wcup.v{background:var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);}
+
+  /* Responsive Grids */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .grid-2-tasks { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; margin-bottom: 1.5rem; align-items: start; }
+  .grid-2-charts { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin-bottom: 1.5rem; align-items: start; }
+  
+  .card { background:var(--color-bg-card); border:1px solid var(--color-border); border-radius:var(--border-radius-lg); padding:1rem 1.25rem; }
+
+  @media (max-width: 768px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-2-tasks { grid-template-columns: 1fr; }
+    .grid-2-charts { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="logo-container">
+  <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="plexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00FFFF" />
+        <stop offset="100%" stop-color="#BF00FF" />
+      </linearGradient>
+    </defs>
+    <path d="M30 85 V15 H65 C80 15 80 50 65 50 H30" fill="none" stroke="url(#plexGrad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="60" cy="32.5" r="8" fill="#39FF14"/>
+  </svg>
+  <div class="logo-text">Plex<span>Tracker</span></div>
+</div>
+
+<div class="header-top" style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;">
+  <div>
+    <p style="margin:0 0 3px;font-size:13px;color:var(--neon-yellow);font-weight:bold;" id="topDate"></p>
+    <h1 style="margin:0;font-size:24px;font-weight:700;" id="greetMsg">Get to work.</h1>
+    <p style="margin:4px 0 0;font-size:13px;color:var(--color-text-dim);">Zero Equipment • 100% Discipline</p>
+  </div>
+</div>
+
+<div class="grid-4">
+  <div class="card" style="text-align:center;">
+    <div style="position:relative;width:64px;height:64px;margin:0 auto 8px;">
+      <svg viewBox="0 0 64 64" width="64" height="64" style="display:block;"><circle cx="32" cy="32" r="26" fill="none" stroke="#222" stroke-width="5"/><circle id="ringCal" cx="32" cy="32" r="26" fill="none" stroke="var(--neon-yellow)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="163.4" transform="rotate(-90 32 32)"/></svg>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:700;" id="calLbl">0</div>
+    </div>
+    <p style="margin:0;font-size:12px;color:var(--color-text-dim);">Calories</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="position:relative;width:64px;height:64px;margin:0 auto 8px;">
+      <svg viewBox="0 0 64 64" width="64" height="64" style="display:block;"><circle cx="32" cy="32" r="26" fill="none" stroke="#222" stroke-width="5"/><circle id="ringWork" cx="32" cy="32" r="26" fill="none" stroke="var(--neon-pink)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="163.4" transform="rotate(-90 32 32)"/></svg>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:700;" id="workLbl">0%</div>
+    </div>
+    <p style="margin:0;font-size:12px;color:var(--color-text-dim);">Workout</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="position:relative;width:64px;height:64px;margin:0 auto 8px;">
+      <svg viewBox="0 0 64 64" width="64" height="64" style="display:block;"><circle cx="32" cy="32" r="26" fill="none" stroke="#222" stroke-width="5"/><circle id="ringWater" cx="32" cy="32" r="26" fill="none" stroke="var(--neon-cyan)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="163.4" transform="rotate(-90 32 32)"/></svg>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:700;" id="waterLbl">0/8</div>
+    </div>
+    <p style="margin:0;font-size:12px;color:var(--color-text-dim);">4L Water</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="position:relative;width:64px;height:64px;margin:0 auto 8px;">
+      <svg viewBox="0 0 64 64" width="64" height="64" style="display:block;"><circle cx="32" cy="32" r="26" fill="none" stroke="#222" stroke-width="5"/><circle id="ringTask" cx="32" cy="32" r="26" fill="none" stroke="var(--neon-green)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="163.4" transform="rotate(-90 32 32)"/></svg>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:700;" id="taskLbl">0/11</div>
+    </div>
+    <p style="margin:0;font-size:12px;color:var(--color-text-dim);">Tasks Done</p>
+  </div>
+</div>
+
+<div class="grid-2-tasks">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <p style="margin:0;font-size:16px;font-weight:700;color:var(--neon-pink);text-shadow: 0 0 5px rgba(255,0,127,0.3);">Workout Protocol</p>
+      <span style="font-size:12px;color:var(--color-text-dim);" id="dayDur"></span>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;" id="dayTabs"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px;background:#1a1a1a;border-radius:var(--border-radius-md);">
+      <div id="dayDot" style="width:12px;height:12px;border-radius:50%;flex-shrink:0;"></div>
+      <div>
+        <p style="margin:0;font-size:16px;font-weight:700;" id="dayName"></p>
+        <p style="margin:4px 0 0;font-size:12px;color:var(--color-text-dim);" id="dayTag"></p>
+      </div>
+    </div>
+    <div id="exList"></div>
+  </div>
+
+  <div class="card">
+    <p style="margin:0 0 16px;font-size:16px;font-weight:700;color:var(--neon-green);text-shadow: 0 0 5px rgba(57,255,20,0.3);">Daily Directives</p>
+    <div id="todoList"></div>
+  </div>
+</div>
+
+<div class="grid-2-charts">
+  <div class="card">
+    <p style="margin:0 0 3px;font-size:16px;font-weight:700;">Live Weekly Volume</p>
+    <p style="margin:0 0 10px;font-size:12px;color:var(--color-text-dim);">Exercises checked off per day</p>
+    <div style="position:relative;height:180px;"><canvas id="weeklyChart"></canvas></div>
+  </div>
+  <div class="card">
+    <p style="margin:0 0 3px;font-size:16px;font-weight:700;">Training Split</p>
+    <p style="margin:0 0 10px;font-size:12px;color:var(--color-text-dim);">6-day muscle focus distribution</p>
+    <div style="position:relative;height:160px;"><canvas id="splitChart"></canvas></div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:1.5rem; overflow-x: auto;">
+  <p style="margin:0 0 16px;font-size:16px;font-weight:700;color:var(--neon-purple);text-shadow: 0 0 5px rgba(191,0,255,0.3);">Habit Consistency Grid</p>
+  <div id="habitGrid" style="min-width: 600px;"></div>
+</div>
+
+<div class="card" style="margin-bottom:2.5rem;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div>
+      <p style="margin:0;font-size:16px;font-weight:700;color:var(--neon-cyan);text-shadow: 0 0 5px rgba(0,255,255,0.3);">4L Hydration Goal</p>
+      <p style="margin:4px 0 0;font-size:12px;color:var(--color-text-dim);" id="waterStat"></p>
+    </div>
+    <button onclick="resetWater()" style="font-size:12px;padding:6px 12px;cursor:pointer;border-radius:var(--border-radius-md);border:1px solid var(--neon-cyan);background:transparent;color:var(--neon-cyan);font-weight:bold;">Reset</button>
+  </div>
+  <div id="waterCups" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;"></div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const CIRC = 163.4;
+
+const workouts = [
+  {name:'Push day',tag:'Chest · Shoulders · Triceps',color:'#FF007F',dur:'~45 min',cpp:45,goal:400, ex:[{n:'Standard push-ups',s:'4 sets',r:'15 reps'},{n:'Pike push-ups',s:'3 sets',r:'12 reps'},{n:'Diamond push-ups',s:'3 sets',r:'10 reps'},{n:'Chair dips',s:'3 sets',r:'15 reps'}]},
+  {name:'Pull day',tag:'Back · Biceps',color:'#00FFFF',dur:'~40 min',cpp:40,goal:350, ex:[{n:'Doorway Rows',s:'4 sets',r:'15 reps'},{n:'Reverse snow angels',s:'3 sets',r:'12 reps'},{n:'Superman holds',s:'3 sets',r:'12 reps'},{n:'Towel Bicep Curls',s:'3 sets',r:'15 reps'}]},
+  {name:'Leg day',tag:'Quads · Hamstrings · Calves',color:'#FFEA00',dur:'~50 min',cpp:55,goal:450, ex:[{n:'Jump squats',s:'4 sets',r:'20 reps'},{n:'Bulgarian split squats',s:'3 sets',r:'12 each'},{n:'Glute bridges',s:'4 sets',r:'20 reps'},{n:'Calf raises',s:'3 sets',r:'25 reps'}]},
+  {name:'Core & Aesthetics',tag:'Abs · Stability',color:'#39FF14',dur:'~35 min',cpp:80,goal:600, ex:[{n:'Plank',s:'3 sets',r:'60 sec'},{n:'Side Plank',s:'3 sets',r:'45 sec'},{n:'Bicycle Crunches',s:'3 sets',r:'20 reps'},{n:'Hollow Body Holds',s:'3 sets',r:'30 sec'}]},
+  {name:'Full Body HIIT',tag:'Fat Burn',color:'#BF00FF',dur:'~45 min',cpp:45,goal:400, ex:[{n:'Burpees',s:'4 sets',r:'15 reps'},{n:'Mountain Climbers',s:'4 sets',r:'45 sec'},{n:'Jumping Jacks',s:'4 sets',r:'45 sec'},{n:'High Knees',s:'4 sets',r:'45 sec'}]},
+  {name:'Active Recovery',tag:'Mobility · Limber',color:'#00E5FF',dur:'~45 min',cpp:55,goal:450, ex:[{n:'Deep stretching',s:'1 session',r:'15 min'},{n:'Yoga flows',s:'1 session',r:'15 min'},{n:'Posture Correction',s:'1 session',r:'10 min'}]},
+  {name:'Rest',tag:'Complete recovery',color:'#888888',dur:'~0 min',cpp:0,goal:1, ex:[{n:'Complete Recovery',s:'Daily',r:'Max Rest'}]}
+];
+
+const todos = [
+  {id:'t1', t:'Morning Routine & Wake up'},
+  {id:'t2', t:'Read 1 Chapter (Mindset/Biz)'},
+  {id:'t3', t:'Revise 1 Core Concept'},
+  {id:'t4', t:'Skill Building (Finance/Biz)'},
+  {id:'t5', t:'Skill Building (Communication)'},
+  {id:'t6', t:'Attend All Tuitions'},
+  {id:'t7', t:'Hit 4L Water Target'},
+  {id:'t8', t:'Calisthenics Protocol (1 Hour)'},
+  {id:'t9', t:'Tuition Homework (Zero Backlogs)'},
+  {id:'t10', t:'Aesthetic Posture/Mobility (10 min)'},
+  {id:'t11', t:'Digital Sunset & Plan Tomorrow'}
+];
+
+const habitsData = [
+  {name:'Workout done'},{name:'Water 4L Hit'},{name:'Study Concepts'},{name:'Read 1 Chapter'},{name:'Tuition HW Done'}
+];
+
+let myChartInstance = null;
+
+// --- LOCAL STORAGE ENGINE (WITH AUTO-RESET) ---
+const todayDateString = new Date().toDateString();
+let savedDate = localStorage.getItem('last_login_date');
+
+if (savedDate !== todayDateString) {
+  localStorage.removeItem('my_tasks');
+  localStorage.removeItem('my_water');
+  localStorage.setItem('last_login_date', todayDateString);
+}
+
+let taskDone = new Set(JSON.parse(localStorage.getItem('my_tasks')) || []);
+let exDone = JSON.parse(localStorage.getItem('my_exercises')) || {};
+for(let day in exDone) { exDone[day] = new Set(exDone[day]); }
+let waterCnt = parseInt(localStorage.getItem('my_water')) || 0;
+let habitState = JSON.parse(localStorage.getItem('my_habits')) || Array(5).fill().map(() => Array(7).fill(0));
+
+function saveData() {
+  localStorage.setItem('my_tasks', JSON.stringify([...taskDone]));
+  let exDoneToSave = {};
+  for(let day in exDone) { exDoneToSave[day] = [...exDone[day]]; }
+  localStorage.setItem('my_exercises', JSON.stringify(exDoneToSave));
+  localStorage.setItem('my_water', waterCnt);
+  localStorage.setItem('my_habits', JSON.stringify(habitState));
+  localStorage.setItem('last_login_date', todayDateString);
+  updateDynamicChart();
+}
+
+// --- APP LOGIC ---
+const jsDay = new Date().getDay();
+const todayIdx = jsDay === 0 ? 6 : jsDay - 1;
+let selDay = todayIdx;
+
+function setRing(id, pct) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.setAttribute('stroke-dashoffset', (CIRC * (1 - Math.max(0, Math.min(100, pct)) / 100)).toFixed(1));
+}
+
+function getEx(day) {
+  if (!exDone[day]) exDone[day] = new Set();
+  return exDone[day];
+}
+
+function updateRings() {
+  const w = workouts[selDay];
+  const ed = getEx(selDay);
+  const total = w.ex.length;
+  const done = ed.size;
+  const wpct = total ? Math.round(done / total * 100) : 0;
+  
+  setRing('ringWork', wpct);
+  document.getElementById('workLbl').textContent = wpct + '%';
+  
+  const cal = done * w.cpp;
+  setRing('ringCal', Math.min(100, Math.round(cal / w.goal * 100)));
+  document.getElementById('calLbl').textContent = cal;
+  
+  setRing('ringWater', Math.round(waterCnt / 8 * 100));
+  document.getElementById('waterLbl').textContent = waterCnt + '/8';
+  document.getElementById('waterStat').textContent = waterCnt + ' of 8 bottles · ' + (waterCnt * 500) + ' ml';
+  
+  const td = taskDone.size;
+  const tt = todos.length;
+  setRing('ringTask', tt ? Math.round(td / tt * 100) : 0);
+  document.getElementById('taskLbl').textContent = td + '/' + tt;
+}
+
+function renderDayTabs() {
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const el = document.getElementById('dayTabs');
+  el.innerHTML = '';
+  days.forEach((d, i) => {
+    const b = document.createElement('button');
+    b.className = 'dtab' + (i === selDay ? ' on' : '');
+    b.textContent = d + (i === todayIdx ? ' *' : '');
+    b.onclick = () => { selDay = i; renderDayTabs(); renderExercises(); updateRings(); };
+    el.appendChild(b);
+  });
+}
+
+function renderExercises() {
+  const w = workouts[selDay];
+  document.getElementById('dayDot').style.background = w.color;
+  document.getElementById('dayDot').style.boxShadow = `0 0 10px ${w.color}`;
+  document.getElementById('dayName').textContent = w.name;
+  document.getElementById('dayTag').textContent = w.tag;
+  document.getElementById('dayDur').textContent = w.dur;
+  const el = document.getElementById('exList');
+  el.innerHTML = '';
+  const done = getEx(selDay);
+  w.ex.forEach((ex, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0; border-bottom:1px solid var(--color-border); cursor:pointer; transition:0.2s;';
+    const checked = done.has(i);
+    const chk = document.createElement('div');
+    chk.className = 'cb' + (checked ? ' v' : '');
+    if (checked) chk.innerHTML = '<span style="color:#000;font-size:12px;font-weight:bold;">✓</span>';
+    const nm = document.createElement('span');
+    nm.style.cssText = 'font-size:14px;flex:1;font-weight:500;' + (checked ? 'text-decoration:line-through;color:var(--color-text-dim);' : 'color:var(--color-text-main);');
+    nm.textContent = ex.n;
+    const reps = document.createElement('span');
+    reps.style.cssText = 'font-size:11px;padding:3px 10px;border-radius:var(--border-radius-md);background:#1a1a1a;color:var(--color-text-dim); border: 1px solid #333;';
+    reps.textContent = ex.r;
+    row.appendChild(chk); row.appendChild(nm); row.appendChild(reps);
+    row.onclick = () => {
+      if (done.has(i)) done.delete(i); else done.add(i);
+      saveData(); renderExercises(); updateRings();
+    };
+    el.appendChild(row);
+  });
+}
+
+function renderTodos() {
+  const el = document.getElementById('todoList');
+  el.innerHTML = '';
+  todos.forEach(t => {
+    const row = document.createElement('div');
+    const done = taskDone.has(t.id);
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--color-border);cursor:pointer;';
+    const chk = document.createElement('div');
+    chk.className = 'rcb' + (done ? ' v' : '');
+    if (done) chk.innerHTML = '<span style="color:#000;font-size:12px;font-weight:bold;">✓</span>';
+    const txt = document.createElement('span');
+    txt.style.cssText = 'font-size:14px;flex:1;font-weight:500;' + (done ? 'text-decoration:line-through;color:var(--color-text-dim);' : 'color:var(--color-text-main);');
+    txt.textContent = t.t;
+    row.appendChild(chk); row.appendChild(txt);
+    row.onclick = () => {
+      if (taskDone.has(t.id)) taskDone.delete(t.id); else taskDone.add(t.id);
+      saveData(); renderTodos(); updateRings();
+    };
+    el.appendChild(row);
+  });
+}
+
+function renderHabits() {
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let html = '<table style="border-collapse:separate;border-spacing:8px;width:100%;">';
+  html += '<thead><tr><th style="text-align:left;font-size:12px;color:var(--color-text-dim);font-weight:600;">Habit</th>';
+  days.forEach((d, i) => { html += '<th style="font-size:12px;text-align:center;color:var(--color-text-main);">' + d + '</th>'; });
+  html += '</tr></thead><tbody>';
+  habitsData.forEach((h, r) => {
+    html += '<tr><td style="font-size:13px;color:var(--color-text-main);font-weight:500;">' + h.name + '</td>';
+    days.forEach((_, c) => {
+      const on = habitState[r][c];
+      html += '<td style="text-align:center;"><div class="hc' + (on?' v':'') + '" onclick="toggleHabit(' + r + ',' + c + ')" style="margin:0 auto;"></div></td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('habitGrid').innerHTML = html;
+}
+
+function toggleHabit(r, c) {
+  habitState[r][c] = habitState[r][c] ? 0 : 1;
+  saveData(); renderHabits();
+}
+
+function renderWater() {
+  const el = document.getElementById('waterCups');
+  el.innerHTML = '';
+  for (let i = 0; i < 8; i++) {
+    const wrap = document.createElement('div');
+    const cup = document.createElement('div');
+    cup.className = 'wcup' + (i < waterCnt ? ' v' : '');
+    wrap.appendChild(cup);
+    wrap.onclick = () => { waterCnt = i < waterCnt ? i : i + 1; saveData(); renderWater(); updateRings(); };
+    el.appendChild(wrap);
+  }
+}
+function resetWater() { waterCnt = 0; saveData(); renderWater(); updateRings(); }
+
+function updateDynamicChart() {
+  if(!myChartInstance) return;
+  const realData = [0,1,2,3,4,5,6].map(day => {
+    return exDone[day] ? exDone[day].size : 0;
+  });
+  myChartInstance.data.datasets[0].data = realData;
+  myChartInstance.update();
+}
+
+function initCharts() {
+  if (typeof Chart === 'undefined') { setTimeout(initCharts, 80); return; }
+  const lc = '#666666';
+  
+  const realData = [0,1,2,3,4,5,6].map(day => {
+    return exDone[day] ? exDone[day].size : 0;
+  });
+
+  const wCtx = document.getElementById('weeklyChart');
+  if (wCtx) {
+    myChartInstance = new Chart(wCtx.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets: [
+          {label:'Completed', data:realData, backgroundColor:'#FF007F', borderRadius:4},
+          {label:'Target', data:[4,4,4,4,4,3,2], backgroundColor:'#222222', borderRadius:4}
+        ]
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false},ticks:{color:lc}},y:{min:0,max:5,ticks:{stepSize:1,color:lc},grid:{color:'#222'}}} }
+    });
+  }
+
+  const sCtx = document.getElementById('splitChart');
+  if (sCtx) {
+    new Chart(sCtx.getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels:['Push','Pull','Legs','Core','HIIT'],
+        datasets:[{data:[20,20,20,20,20],backgroundColor:['#FF007F','#00FFFF','#FFEA00','#39FF14','#BF00FF'],borderWidth:2,borderColor:'#111'}]
+      },
+      options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}
+    });
+  }
+}
+
+function initHeader() {
+  const now = new Date();
+  const dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('topDate').textContent = dn[now.getDay()].toUpperCase() + ', ' + mn[now.getMonth()].toUpperCase() + ' ' + now.getDate();
+}
+
+initHeader(); renderDayTabs(); renderExercises(); renderTodos(); renderHabits(); renderWater(); updateRings(); initCharts();
+</script>
+</body>
+</html>
